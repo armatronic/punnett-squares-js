@@ -54,8 +54,8 @@ Gene.fromAlleles = function(a1, a2) {
     return new Gene(a1, a2);
 }
 Gene.fromString = function(str) {
-    var [a1, a2] = str.split('/');
-    return Gene.fromAlleles(Allele.fromString(a1), Allele.fromString(a2));
+    var parts = str.split('/');
+    return Gene.fromAlleles(Allele.fromString(parts[0]), Allele.fromString(parts[1]));
 }
 Gene.prototype.isLethal = function() {
     return this.allele1.equals(this.allele2);
