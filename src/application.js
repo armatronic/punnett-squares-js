@@ -1,4 +1,4 @@
-(function() {
+(function($) {
     //
     // Show punnett squares.
     $('form[name=punnett-squares]').submit(function() {
