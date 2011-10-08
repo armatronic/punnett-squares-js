@@ -1,4 +1,3 @@
-//alert('g');
 // AlleleString
 function Allele(name) {
     this.name = name;
@@ -106,7 +105,7 @@ GeneString.prototype.isLethal = function() {
 // Breed this gene string in all possible combinations.
 GeneString.prototype.getPossibleAlleleStrings = function() {
     //
-    // Possible child count: 2^gene_string_length 
+    // Possible child count: 2^gene_string_length
     // (2 possible combinations per gene)
     var child_count = Math.pow(2, this.length);
     var children = [];
