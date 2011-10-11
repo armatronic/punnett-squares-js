@@ -2,17 +2,24 @@
 <head>
 </head>
 <body>
-<form name="punnett-squares">
-Gene 1: <input type="input" name="gene1" value="A/a;B/B;C/c" /><br />
-Gene 2: <input type="input" name="gene2" value="d/d;E/e;F/F" /><br />
-<input type="submit" />
-</form>
-<table id="punnett-table">
-</table>
+    <div id="punnett-squares">
+        <form name="punnett-squares">
+        Gene 1: <input type="input" name="gene1" value="A/a;B/B;C/c" /><br />
+        Gene 2: <input type="input" name="gene2" value="d/d;E/e;F/F" /><br />
+        <input type="submit" />
+        </form>
+        <table id="punnett-table">
+        </table>
+    </div>
 
-<script type="text/javascript" src="assets/js/jquery-1.6.4.min.js"></script>
-<script type="text/javascript" src="src/application.js"></script>
-<script type="text/javascript" src="src/punnettsquares.js"></script>
+    <script type="text/javascript" src="assets/js/jquery-1.6.4.min.js"></script>
+    <script type="text/javascript" src="assets/js/underscore-1.2.0.min.js"></script>
+    <script type="text/javascript" src="assets/js/backbone-0.5.3.min.js"></script>
+
+
+    <script type="text/javascript" src="src/application.js"></script>
+    <script type="text/javascript" src="src/modules/gene.js"></script>
+    <!--<script type="text/javascript" src="src/punnettsquares.js"></script>-->
 
 </body>
 </html>
