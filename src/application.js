@@ -26,7 +26,8 @@ var punnettSquares = {
 (function($) {
     $(function() {
         var g = punnettSquares.module('gene');
-        new g.View();
+        var gene_view = new g.View({el: '#punnett-squares'});
+        gene_view.render();
     });
 })(jQuery);
 
