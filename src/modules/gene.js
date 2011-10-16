@@ -67,37 +67,61 @@
             }).join(';');
         },
 
-        getOffspring: function() {
-            //
-            // Returns a collection of collections of genes?
-            // Runs 4^min(gene1.length, gene2.length) times.
-            // At each gene, there are 4 possible combinations.
-            var gene_matrix = [];
-            var gene_size   = Math.min(this.gene1.length, this.gene2.length);
-            var gene_count  = Math.pow(4, gene_size);
-            for (var i = 0; i < gene_count; i++) {
-                //
-                // First
-                var new_gene = [];
-                for (var j = 0; j < gene_size; j++) {
-                    var genepart_1 = this.gene1[j];
-                    var genepart_2 = this.gene2[j];
-                    //
-                    // Which part is used?
-                    var key = i << (2*j);
-                    new_gene.push([
-                        (key & 1 ? genepart_1[1] : genepart_1[0]),
-                        (key & 2 ? genepart_2[1] : genepart_2[0]),
-                    ])
-                }
-                console.log(this.join(new_gene));
-                gene_matrix.push(new_gene);
+        joinAllele: function(a) {
+            return a.join(';');
+        },
+
+        joinAlleles: function(a1, a2) {
+            return _.zip(a1, a2);
+        },
+
+        //
+        // Get every possible combination of allele strings from this set.
+        getAllAlleleStrings: function(n) {
+            var gene = [];
+            if (n == 1) {
+                gene = this.gene1;
             }
+            else if (n == 2) {
+                gene = this.gene2;
+            }
+            if (gene.length == 0) {
+                return [];
+            }
+            var combination_count = Math.pow(2, gene.length);
+            var allele_strings    = [];
+            for (var i = 0; i < combination_count; i++) {
+                var allele_string = []
+                _.each(gene, function(part, j) {
+                    var key = i >> j;
+                    allele_string.push(key & 1 ? part[1] : part[0]);
+                });
+                allele_strings.push(allele_string);
+            }
+            return allele_strings;
+        },
+
+        getOffspring: function() {
+            var gene_matrix = {};
+            var gene_size   = Math.min(this.gene1.length, this.gene2.length);
+
+            var gene1_allele_strings = this.getAllAlleleStrings(1);
+            var gene2_allele_strings = this.getAllAlleleStrings(2);
+
+            _.each(gene1_allele_strings, function(g1_string, i) {
+                var gene_row = {
+                    allele: this.joinAllele(g1_string),
+                    pairs:  {}
+                }
+                _.each(gene2_allele_strings, function(g2_string, j) {
+                    gene_row.pairs[j] = {
+                        allele: this.joinAllele(g2_string),
+                        gene:   this.join(this.joinAlleles(g1_string, g2_string))
+                    }
+                }, this);
+                gene_matrix[i] = gene_row;
+            }, this);
             return gene_matrix;
-
-
-            //
-            // Iterate thru each pair.
         }
     });
 
