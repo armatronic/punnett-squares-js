@@ -306,9 +306,11 @@ Genome.prototype.getPossibleAlleleStrings = function(max_length) {
         for (var j = 0; j < length; j++) {
             //
             // Add a gene for this position.
-            // Which allele is added from the first and second gene?
+            // Exchange last gene, then second last, and so on so that the list
+            // of allele strings is in this order:
+            // a1/a2;b1/b2;c1/c2 => a1/b1/c1, a1/b1/c2, a1/b2/c1, a1/b2/c2, ...
             var gene = this.elementAt(j);
-            allele_list.push((Math.pow(2, j) & i) ? gene.allele1 : gene.allele2);
+            allele_list.push((Math.pow(2, (length - j - 1)) & i) ? gene.allele1 : gene.allele2);
         }
         children.push(AlleleString.fromAlleles(allele_list));
     }
