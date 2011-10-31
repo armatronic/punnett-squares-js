@@ -83,9 +83,10 @@ AlleleString.fromString = function(str) {
     //
     // Alleles are split by ; characters.
     var allele_list = [];
-    $.each(str.split(';'), function(i, v) {
-        allele_list.push(Allele.fromString(v));
-    });
+    var parts       = str.split(';');
+    for (var i in parts) {
+        allele_list.push(Allele.fromString(parts[i]));
+    }
     return AlleleString.fromAlleles(allele_list);
 };
 
@@ -256,11 +257,10 @@ Genome.fromAlleleStrings = function(string1, string2) {
  */
 Genome.fromString = function(str) {
     var genes = [];
-    //
-    // Genes are split by ; characters.
-    $.each(str.split(';'), function(i, v) {
-        genes.push(Gene.fromString(v));
-    });
+    var parts = str.split(';');
+    for (var i in parts) {
+        genes.push(Gene.fromString(parts[i]));
+    }
     return Genome.fromGenes(genes);
 };
 
@@ -326,10 +326,11 @@ Genome.prototype.getPossibleAlleleStrings = function(max_length) {
  * @return array[Genome]
  */
 Genome.prototype.getPossibleChildrenFromAlleleString = function(other_string) {
-    var child_genomes = [];
-    $.each(this.getPossibleAlleleStrings(), function(i, string) {
-        child_genomes.push(Genome.fromAlleleStrings(string, other_string));
-    });
+    var child_genomes  = [];
+    var allele_strings = this.getPossibleAlleleStrings();
+    for (var i in allele_strings) {
+        child_genomes.push(Genome.fromAlleleStrings(allele_strings[i], other_string));
+    }
     return child_genomes;
 };
 
@@ -343,12 +344,13 @@ Genome.prototype.getPossibleChildrenFromAlleleString = function(other_string) {
  */
 Genome.prototype.getPossibleChildrenFromGenome = function(other_genome) {
     var child_genomes = [];
+    var allele_strings = this.getPossibleAlleleStrings();
     var other_strings = other_genome.getPossibleAlleleStrings();
-    $.each(this.getPossibleAlleleStrings(), function(i, string) {
-        $.each(other_strings, function(j, other_string) {
-            child_genomes.push(Genome.fromAlleleStrings(string, other_string));
-        });
-    });
+    for (var i in allele_strings) {
+        for (var j in other_strings) {
+            child_genomes.push(Genome.fromAlleleStrings(allele_strings[i], other_strings[j]));
+        }
+    }
     return child_genomes;
 };
 
