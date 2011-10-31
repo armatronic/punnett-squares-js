@@ -140,25 +140,27 @@
             var g2 = this.model.setGene2(this.$('input.gene2').val());
             var parts = this.model.getOffspring();
 
-            var table = this.$('table.punnett_table').empty();
-
-            _.each(parts, function(part, i) {
-                if (i == 0) {
-                    var header = $('<tr />');
-                    header.append('<th />');
-                    _.each(part.pairs, function(other_part) {
-                        header.append($('<th />').text(other_part.allele));
-                    });
-                    table.append(header);
+            //
+            // Compile and store in local or session storage.
+            // Not sure about Pure templates - too much logic here rather than
+            // in template? Still it's better than Mustache (can't tell it to
+            // display header cells only on first offspring row) and much better
+            // than HTML by itself.
+            var renderTemplate = $('#punnett-table-template').compile({
+                '.header .header_cell': {
+                    'other_part<-parts.0.pairs': {'.': 'other_part.allele'}
+                },
+                '.rows': {
+                    'part<-parts': {
+                        '.header_cell': 'part.allele',
+                        '.result_cell': {
+                            'pair<-part.pairs': {'.': 'pair.gene'}
+                        }
+                    }
                 }
-                var row = $('<tr />');
-                row.append($('<th />').text(part.allele));
-                _.each(part.pairs, function(other_part) {
-                    row.append($('<td />').text(other_part.gene));
-                });
-                table.append(row);
             });
-
+            var table = $('table.punnett_table', renderTemplate({parts: parts}));
+            this.$('#punnett-table').empty().append(table);
             return this;
         },
         events: {
