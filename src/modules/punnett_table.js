@@ -1,30 +1,7 @@
-(function(Gene) {
+(function(punnettTable) {
     //
-    // Gene model definition.
-    // Includes methods for combining with other genes?
-    Gene.Model = Backbone.Model.extend({
-        defaults: { string: '' },
-
-        split: function() {
-            //
-            // Assume all genes are split by ;, and alleles within a gene
-            // are split with /.
-            return _.map(this.string.split(';'), function(part) {
-                var subparts = part.split('/');
-                var part_a   = subparts.length > 0 ? subparts[0] : '';
-                var part_b   = subparts.length > 1 ? subparts[1] : '';
-                return [part_a.trim(), part_b.trim()];
-            });
-        },
-
-        breedWith: function(other_gene) {
-            //
-            // Returns a collection of collections of genes?
-        }
-    });
-
-
-    Gene.GenePair = Backbone.Model.extend({
+    // Model for a breeding pair of genes.
+    punnettTable.GenePair = Backbone.Model.extend({
         defaults: {
             gene1: [],
             gene2: []
@@ -123,8 +100,8 @@
 
     //
     // View: renders result of breedWith() into a table. (check out jQuery templates)
-    Gene.View = Backbone.View.extend({
-        model: new Gene.GenePair(),
+    punnettTable.View = Backbone.View.extend({
+        model: new punnettTable.GenePair(),
         //
         // add a template later.
         render: function() {
