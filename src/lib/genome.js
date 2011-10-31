@@ -11,7 +11,7 @@
  */
 function Allele(name) {
     this.name = name;
-}
+};
 
 /**
  * Creates an allele from a string.
@@ -25,7 +25,7 @@ function Allele(name) {
  */
 Allele.fromString = function(name) {
     return new Allele(name);
-}
+};
 
 /**
  * Compares this allele with another.
@@ -36,7 +36,7 @@ Allele.fromString = function(name) {
  */
 Allele.prototype.equals = function(other) {
     return this.name == other.name;
-}
+};
 
 /**
  * Returns string representation of this allele.
@@ -45,7 +45,7 @@ Allele.prototype.equals = function(other) {
  */
 Allele.prototype.toString = function() {
     return this.name;
-}
+};
 
 
 /**
@@ -57,7 +57,7 @@ Allele.prototype.toString = function() {
 function AlleleString(list) {
     this.alleles = list;
     this.length = this.alleles.length;
-}
+};
 
 /**
  * Creates allele string from a list of alleles.
@@ -68,7 +68,7 @@ function AlleleString(list) {
  */
 AlleleString.fromAlleles = function(list) {
     return new AlleleString(list);
-}
+};
 
 /**
  * Creates allele string from a string representation.
@@ -87,7 +87,7 @@ AlleleString.fromString = function(str) {
         allele_list.push(Allele.fromString(v));
     });
     return AlleleString.fromAlleles(allele_list);
-}
+};
 
 /**
  * Creates a new genome from the breeding of this and another AlleleString.
@@ -98,7 +98,7 @@ AlleleString.fromString = function(str) {
  */
 AlleleString.prototype.breedWith = function(other) {
     return Genome.fromAlleleStrings(this, other);
-}
+};
 
 /**
  * Retrieves the allele at position i (starting at 0).
@@ -109,7 +109,7 @@ AlleleString.prototype.breedWith = function(other) {
  */
 AlleleString.prototype.elementAt = function(i) {
     return this.alleles[i];
-}
+};
 
 /**
  * Compares this allele string to another.
@@ -120,7 +120,7 @@ AlleleString.prototype.elementAt = function(i) {
  */
 AlleleString.prototype.equals = function(other) {
     return this.alleles == other.alleles;
-}
+};
 
 /**
  * Returns string representation of this allele string. Essentially, the
@@ -130,7 +130,7 @@ AlleleString.prototype.equals = function(other) {
  */
 AlleleString.prototype.toString = function() {
     return this.alleles.join(';');
-}
+};
 
 
 /**
@@ -143,7 +143,7 @@ AlleleString.prototype.toString = function() {
 function Gene(allele1, allele2) {
     this.allele1 = allele1;
     this.allele2 = allele2;
-}
+};
 
 /**
  * Creates a gene from two alleles.
@@ -155,7 +155,7 @@ function Gene(allele1, allele2) {
  */
 Gene.fromAlleles = function(a1, a2) {
     return new Gene(a1, a2);
-}
+};
 
 /**
  * Creates a gene from a string.
@@ -169,7 +169,7 @@ Gene.fromAlleles = function(a1, a2) {
 Gene.fromString = function(str) {
     var parts = str.split('/');
     return Gene.fromAlleles(Allele.fromString(parts[0]), Allele.fromString(parts[1]));
-}
+};
 
 /**
  * A gene can be considered as lethal to a genome that it is a part of if its
@@ -179,7 +179,7 @@ Gene.fromString = function(str) {
  */
 Gene.prototype.isLethal = function() {
     return this.allele1.equals(this.allele2);
-}
+};
 
 /**
  * Compares this gene string to another.
@@ -190,7 +190,7 @@ Gene.prototype.isLethal = function() {
  */
 Gene.prototype.equals = function(other) {
     return this.allele1.equals(other.allele1) && this.allele2.equals(other.allele2);
-}
+};
 
 /**
  * Returns string representation of this gene. Essentially, the opposite of
@@ -200,7 +200,7 @@ Gene.prototype.equals = function(other) {
  */
 Gene.prototype.toString = function() {
     return this.allele1.toString()+'/'+this.allele2.toString();
-}
+};
 
 
 /**
@@ -211,7 +211,7 @@ Gene.prototype.toString = function() {
 Genome = function(genes) {
     this.genes = genes;
     this.length = this.genes.length;
-}
+};
 
 /**
  * Creates a genome from a list of genes.
@@ -222,7 +222,7 @@ Genome = function(genes) {
  */
 Genome.fromGenes = function(genes) {
     return new Genome(genes);
-}
+};
 
 /**
  * Creates a genome from two allele strings by breeding them together.
@@ -242,7 +242,7 @@ Genome.fromAlleleStrings = function(string1, string2) {
         genes[i] = Gene.fromAlleles(string1.elementAt(i), string2.elementAt(i));
     }
     return Genome.fromGenes(genes);
-}
+};
 
 /**
  * Creates a genome from a string representation.
@@ -262,7 +262,7 @@ Genome.fromString = function(str) {
         genes.push(Gene.fromString(v));
     });
     return Genome.fromGenes(genes);
-}
+};
 
 /**
  * A genome is considered lethal if any of its genes are lethal (i.e. they have
@@ -277,7 +277,7 @@ Genome.prototype.isLethal = function() {
         }
     }
     return false;
-}
+};
 
 /**
  * Retrieves all possible allele strings that this genome can provide during the
@@ -287,17 +287,23 @@ Genome.prototype.isLethal = function() {
  * to an allele string - therefore, there are 2^genome.length possible allele
  * strings that could be created.
  *
+ * @param int max_length If provided, all genes after this position are ignored.
+ *
  * @return array[AlleleString]
  */
-Genome.prototype.getPossibleAlleleStrings = function() {
+Genome.prototype.getPossibleAlleleStrings = function(max_length) {
     //
     // Possible child count: 2^gene_string_length
     // (2 possible combinations per gene)
-    var child_count = Math.pow(2, this.length);
+    var length = this.length;
+    if (typeof max_length != 'undefined') {
+        length = Math.min(max_length, length);
+    }
+    var child_count = Math.pow(2, length);
     var children = [];
     for (var i = 0; i < child_count; i++) {
         var allele_list = [];
-        for (var j = 0; j < this.length; j++) {
+        for (var j = 0; j < length; j++) {
             //
             // Add a gene for this position.
             // Which allele is added from the first and second gene?
@@ -307,7 +313,7 @@ Genome.prototype.getPossibleAlleleStrings = function() {
         children.push(AlleleString.fromAlleles(allele_list));
     }
     return children;
-}
+};
 
 /**
  * Gets all possible children that could come from this genome and another
@@ -323,7 +329,7 @@ Genome.prototype.getPossibleChildrenFromAlleleString = function(other_string) {
         child_genomes.push(Genome.fromAlleleStrings(string, other_string));
     });
     return child_genomes;
-}
+};
 
 /**
  * Gets all possible children that could come from this genome and another
@@ -342,7 +348,7 @@ Genome.prototype.getPossibleChildrenFromGenome = function(other_genome) {
         });
     });
     return child_genomes;
-}
+};
 
 /**
  * Retrieves the gene at position i (starting at 0).
@@ -353,7 +359,7 @@ Genome.prototype.getPossibleChildrenFromGenome = function(other_genome) {
  */
 Genome.prototype.elementAt = function(i) {
     return this.genes[i];
-}
+};
 
 /**
  * Comparison for whether this genome is the same as another.
@@ -371,7 +377,7 @@ Genome.prototype.equals = function(other) {
         }
     }
     return true;
-}
+};
 
 /**
  * Returns a string representation of this genome.
@@ -380,4 +386,4 @@ Genome.prototype.equals = function(other) {
  */
 Genome.prototype.toString = function() {
     return this.genes.join(';');
-}
+};
