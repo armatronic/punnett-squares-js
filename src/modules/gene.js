@@ -146,6 +146,7 @@
             // in template? Still it's better than Mustache (can't tell it to
             // display header cells only on first offspring row) and much better
             // than HTML by itself.
+            // (Look@ https://github.com/uglyog/clientside-haml-js)
             var renderTemplate = $('#punnett-table-template').compile({
                 '.header .header_cell': {
                     'other_part<-parts.0.pairs': {'.': 'other_part.allele'}
