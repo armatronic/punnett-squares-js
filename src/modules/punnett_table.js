@@ -83,7 +83,12 @@
                     'part<-parts': {
                         '.header_cell': 'part.alleleString',
                         '.result_cell': {
-                            'pair<-part.pairs': {'.': 'pair.genome'}
+                            'pair<-part.pairs': {
+                                '.':        'pair.genome',
+                                '.@class+': function(a) {
+                                    return (a.item.genome.isLethal()) ? ' lethal ' : ' ';
+                                }
+                            }
                         }
                     }
                 }
