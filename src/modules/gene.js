@@ -1,12 +1,4 @@
 (function(Gene) {
-//    var Gene = {};
-    //
-    // Dependencies: none yet
-
-    //
-    // Shorthand: application container
-    var app = punnettSquares.app;
-
     //
     // Gene model definition.
     // Includes methods for combining with other genes?
@@ -174,4 +166,4 @@
             return false;
         }
     });
-})(punnettSquares.module('gene'));
+})(punnettSquares.module('punnettTable'));
