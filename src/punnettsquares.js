@@ -1,26 +1,84 @@
-// AlleleString
+/**
+ * Library that contains objects that represent genomes (a.k.a. gene strings),
+ * as well as their composite genes and alleles.
+ */
+
+
+/**
+ * Representation of a single allele. (An allele is one half of a gene.)
+ *
+ * @param string name The character for the allele.
+ */
 function Allele(name) {
     this.name = name;
 }
+
+/**
+ * Creates an allele from a string.
+ *
+ * Usually, an allele is represented by a single character, but it may be any
+ * string.
+ *
+ * @param string name The character for the allele.
+ *
+ * @return Allele
+ */
 Allele.fromString = function(name) {
     return new Allele(name);
 }
+
+/**
+ * Compares this allele with another.
+ *
+ * @param Allele other
+ *
+ * @return bool
+ */
 Allele.prototype.equals = function(other) {
     return this.name == other.name;
 }
+
+/**
+ * Returns string representation of this allele.
+ *
+ * @return string
+ */
 Allele.prototype.toString = function() {
     return this.name;
 }
 
 
-// Allele
+/**
+ * Representation of a list of alleles. Usually generated from a gene string as
+ * that gene's possible contributions to a breeding with another gene.
+ *
+ * @param array[Allele] list The list of alleles that go into this string.
+ */
 function AlleleString(list) {
     this.alleles = list;
     this.length = this.alleles.length;
 }
+
+/**
+ * Creates allele string from a list of alleles.
+ *
+ * @param array[Allele] list
+ *
+ * @return AlleleString
+ */
 AlleleString.fromAlleles = function(list) {
     return new AlleleString(list);
 }
+
+/**
+ * Creates allele string from a string representation.
+ *
+ * Alleles within a string are split with ; characters.
+ *
+ * @param string str
+ *
+ * @return AlleleString
+ */
 AlleleString.fromString = function(str) {
     //
     // Alleles are split by ; characters.
@@ -30,70 +88,189 @@ AlleleString.fromString = function(str) {
     });
     return AlleleString.fromAlleles(allele_list);
 }
-AlleleString.prototype.breedWith = function(other_string) {
-    return GeneString.fromAlleleStrings(this, other_string);
+
+/**
+ * Creates a new genome from the breeding of this and another AlleleString.
+ *
+ * @param AlleleString other
+ *
+ * @return Genome
+ */
+AlleleString.prototype.breedWith = function(other) {
+    return Genome.fromAlleleStrings(this, other);
 }
+
+/**
+ * Retrieves the allele at position i (starting at 0).
+ *
+ * @param int i
+ *
+ * @return Allele
+ */
 AlleleString.prototype.elementAt = function(i) {
     return this.alleles[i];
 }
+
+/**
+ * Compares this allele string to another.
+ *
+ * @param AlleleString other
+ *
+ * @return bool
+ */
 AlleleString.prototype.equals = function(other) {
     return this.alleles == other.alleles;
 }
+
+/**
+ * Returns string representation of this allele string. Essentially, the
+ * opposite of AlleleString.fromString().
+ *
+ * @return string
+ */
 AlleleString.prototype.toString = function() {
     return this.alleles.join(';');
 }
 
 
-
-// Gene
+/**
+ * Representation of a single gene within a genome. Each gene contains a pair of
+ * alleles.
+ *
+ * @param Allele allele1
+ * @param Allele allele2
+ */
 function Gene(allele1, allele2) {
     this.allele1 = allele1;
     this.allele2 = allele2;
 }
+
+/**
+ * Creates a gene from two alleles.
+ *
+ * @param Allele allele1
+ * @param Allele allele2
+ *
+ * @return Gene
+ */
 Gene.fromAlleles = function(a1, a2) {
     return new Gene(a1, a2);
 }
+
+/**
+ * Creates a gene from a string.
+ *
+ * Alleles in a gene are split by a / character.
+ *
+ * @param string str
+ *
+ * @return Gene
+ */
 Gene.fromString = function(str) {
     var parts = str.split('/');
     return Gene.fromAlleles(Allele.fromString(parts[0]), Allele.fromString(parts[1]));
 }
+
+/**
+ * A gene can be considered as lethal to a genome that it is a part of if its
+ * alleles are equal.
+ *
+ * @return bool
+ */
 Gene.prototype.isLethal = function() {
     return this.allele1.equals(this.allele2);
 }
+
+/**
+ * Compares this gene string to another.
+ *
+ * @param Gene other
+ *
+ * @return bool
+ */
 Gene.prototype.equals = function(other) {
     return this.allele1.equals(other.allele1) && this.allele2.equals(other.allele2);
 }
+
+/**
+ * Returns string representation of this gene. Essentially, the opposite of
+ * Gene.fromString().
+ *
+ * @return string
+ */
 Gene.prototype.toString = function() {
     return this.allele1.toString()+'/'+this.allele2.toString();
 }
 
 
-// GeneString
-GeneString = function(genes) {
+/**
+ * Representation of a genome.
+ *
+ * @param array[Gene] genes
+ */
+Genome = function(genes) {
     this.genes = genes;
     this.length = this.genes.length;
 }
-GeneString.fromGenes = function(genes) {
-    return new GeneString(genes);
+
+/**
+ * Creates a genome from a list of genes.
+ *
+ * @param array[Gene] genes
+ *
+ * @return Genome
+ */
+Genome.fromGenes = function(genes) {
+    return new Genome(genes);
 }
-GeneString.fromAlleleStrings = function(string1, string2) {
+
+/**
+ * Creates a genome from two allele strings by breeding them together.
+ *
+ * If the allele strings are of varying length, the longer one is truncated to
+ * the same length as the shorter.
+ *
+ * @param AlleleString string1
+ * @param AlleleString string2
+ *
+ * @return Genome
+ */
+Genome.fromAlleleStrings = function(string1, string2) {
     var genes = [];
     var gene_string_length = Math.min(string1.length, string2.length);
     for (var i = 0; i < gene_string_length; i++) {
         genes[i] = Gene.fromAlleles(string1.elementAt(i), string2.elementAt(i));
     }
-    return GeneString.fromGenes(genes);
+    return Genome.fromGenes(genes);
 }
-GeneString.fromString = function(str) {
+
+/**
+ * Creates a genome from a string representation.
+ *
+ * Genes within the genome are split by ; characters, and alleles within each
+ * gene are split by / characters.
+ *
+ * @param string str
+ *
+ * @return Genome
+ */
+Genome.fromString = function(str) {
     var genes = [];
     //
     // Genes are split by ; characters.
     $.each(str.split(';'), function(i, v) {
         genes.push(Gene.fromString(v));
     });
-    return GeneString.fromGenes(genes);
+    return Genome.fromGenes(genes);
 }
-GeneString.prototype.isLethal = function() {
+
+/**
+ * A genome is considered lethal if any of its genes are lethal (i.e. they have
+ * the same allele on both sides).
+ *
+ * @return bool
+ */
+Genome.prototype.isLethal = function() {
     for (var i = 0; i < this.length; i++) {
         if (this.elementAt(i).isLethal()) {
             return true;
@@ -101,9 +278,18 @@ GeneString.prototype.isLethal = function() {
     }
     return false;
 }
-//
-// Breed this gene string in all possible combinations.
-GeneString.prototype.getPossibleAlleleStrings = function() {
+
+/**
+ * Retrieves all possible allele strings that this genome can provide during the
+ * breeding process.
+ *
+ * Each gene within the genome could provide either its first or second allele
+ * to an allele string - therefore, there are 2^genome.length possible allele
+ * strings that could be created.
+ *
+ * @return array[AlleleString]
+ */
+Genome.prototype.getPossibleAlleleStrings = function() {
     //
     // Possible child count: 2^gene_string_length
     // (2 possible combinations per gene)
@@ -122,10 +308,62 @@ GeneString.prototype.getPossibleAlleleStrings = function() {
     }
     return children;
 }
-GeneString.prototype.elementAt = function(i) {
+
+/**
+ * Gets all possible children that could come from this genome and another
+ * allele string.
+ *
+ * @param AlleleString other_string
+ *
+ * @return array[Genome]
+ */
+Genome.prototype.getPossibleChildrenFromAlleleString = function(other_string) {
+    var child_genomes = [];
+    $.each(this.getPossibleAlleleStrings(), function(i, string) {
+        child_genomes.push(Genome.fromAlleleStrings(string, other_string));
+    });
+    return child_genomes;
+}
+
+/**
+ * Gets all possible children that could come from this genome and another
+ * genome.
+ *
+ * @param Genome other_genome
+ *
+ * @return array[Genome]
+ */
+Genome.prototype.getPossibleChildrenFromGenome = function(other_genome) {
+    var child_genomes = [];
+    var other_strings = other_genome.getPossibleAlleleStrings();
+    $.each(this.getPossibleAlleleStrings(), function(i, string) {
+        $.each(other_strings, function(j, other_string) {
+            child_genomes.push(Genome.fromAlleleStrings(string, other_string));
+        });
+    });
+    return child_genomes;
+}
+
+/**
+ * Retrieves the gene at position i (starting at 0).
+ *
+ * @param int i
+ *
+ * @return Gene
+ */
+Genome.prototype.elementAt = function(i) {
     return this.genes[i];
 }
-GeneString.prototype.equals = function(other) {
+
+/**
+ * Comparison for whether this genome is the same as another.
+ *
+ * @return bool
+ */
+Genome.prototype.equals = function(other) {
+    if (this.length != other.length) {
+        return false;
+    }
     var gene_string_length = Math.min(this.length, other.length);
     for (var i = 0; i < gene_string_length; i++) {
         if (!(this.elementAt(i).equals(other.elementAt(i)))) {
@@ -134,6 +372,12 @@ GeneString.prototype.equals = function(other) {
     }
     return true;
 }
-GeneString.prototype.toString = function() {
+
+/**
+ * Returns a string representation of this genome.
+ *
+ * @return string
+ */
+Genome.prototype.toString = function() {
     return this.genes.join(';');
 }
