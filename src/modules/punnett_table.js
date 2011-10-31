@@ -2,95 +2,52 @@
     /**
      * Model for a breeding pair of genes.
      */
-    punnettTable.GenePair = Backbone.Model.extend({
+    punnettTable.GenomePair = Backbone.Model.extend({
         defaults: {
-            gene1: [],
-            gene2: []
+            gene1: new Genome([]),
+            gene2: new Genome([])
         },
         setGene: function(n, sequence) {
             if (n == 1) {
-                return this.gene1 = this.split(sequence);
+                return this.gene1 = Genome.fromString(sequence);
             }
             else if (n == 2) {
-                return this.gene2 = this.split(sequence);
+                return this.gene2 = Genome.fromString(sequence);
             }
             return false;
         },
         setGene1: function(sequence) { return this.setGene(1, sequence); },
         setGene2: function(sequence) { return this.setGene(2, sequence); },
 
-        split: function(sequence) {
-            //
-            // Assume all genes are split by ;, and alleles within a gene
-            // are split with /.
-            return _.map(sequence.split(';'), function(part) {
-                var subparts = part.split('/');
-                var part_a   = subparts.length > 0 ? subparts[0] : '';
-                var part_b   = subparts.length > 1 ? subparts[1] : '';
-                return [part_a.trim(), part_b.trim()];
-            });
-        },
-
-        join: function(parts) {
-            return _.map(parts, function(part) {
-                return part.join('/');
-            }).join(';');
-        },
-
-        joinAllele: function(a) {
-            return a.join(';');
-        },
-
-        joinAlleles: function(a1, a2) {
-            return _.zip(a1, a2);
-        },
-
-        //
-        // Get every possible combination of allele strings from this set.
-        getAllAlleleStrings: function(n) {
-            var gene = [];
-            if (n == 1) {
-                gene = this.gene1;
-            }
-            else if (n == 2) {
-                gene = this.gene2;
-            }
-            if (gene.length == 0) {
-                return [];
-            }
-            var combination_count = Math.pow(2, gene.length);
-            var allele_strings    = [];
-            for (var i = 0; i < combination_count; i++) {
-                var allele_string = []
-                _.each(gene, function(part, j) {
-                    var key = i >> j;
-                    allele_string.push(key & 1 ? part[1] : part[0]);
-                });
-                allele_strings.push(allele_string);
-            }
-            return allele_strings;
-        },
-
+        /**
+         * Retrieves all possible offspring of this.gene1 and this.gene2, and
+         * renders into an array structure.
+         *
+         * @return array An array in the following format:
+         *               [{
+         *                 alleleString: AlleleString,
+         *                 pairs:        [{alleleString: AlleleString, genome: Genome}]
+         *               }]
+         */
         getOffspring: function() {
-            var gene_matrix = {};
+            var gene_matrix = [];
             var gene_size   = Math.min(this.gene1.length, this.gene2.length);
 
-            var gene1_allele_strings = this.getAllAlleleStrings(1);
-            var gene2_allele_strings = this.getAllAlleleStrings(2);
-
-            _.each(gene1_allele_strings, function(g1_string, i) {
+            var gene1_allele_strings = this.gene1.getPossibleAlleleStrings(gene_size);
+            var gene2_allele_strings = this.gene2.getPossibleAlleleStrings(gene_size);
+            _.each(gene1_allele_strings, function(a1_string, i) {
                 var gene_row = {
-                    allele: this.joinAllele(g1_string),
-                    pairs:  {}
-                }
-                _.each(gene2_allele_strings, function(g2_string, j) {
-                    gene_row.pairs[j] = {
-                        allele: this.joinAllele(g2_string),
-                        gene:   this.join(this.joinAlleles(g1_string, g2_string))
-                    }
-                }, this);
-                gene_matrix[i] = gene_row;
-            }, this);
+                    alleleString: a1_string,
+                    pairs:        []
+                };
+                _.each(gene2_allele_strings, function(a2_string, j) {
+                    gene_row.pairs.push({
+                        alleleString: a2_string,
+                        genome:       Genome.fromAlleleStrings(a1_string, a2_string)
+                    });
+                });
+                gene_matrix.push(gene_row);
+            });
             return gene_matrix;
         }
     });
@@ -102,13 +59,13 @@
 
 
     /**
-     * View: renders result of breedWith() into a table.
+     * View: renders result of GenomePair.getOffspring() into a table.
      */
     punnettTable.View = Backbone.View.extend({
-        model: new punnettTable.GenePair(),
+        model: new punnettTable.GenomePair(),
         render: function() {
-            var g1 = this.model.setGene1(this.$('input.gene1').val());
-            var g2 = this.model.setGene2(this.$('input.gene2').val());
+            this.model.setGene1(this.$('input.gene1').val());
+            this.model.setGene2(this.$('input.gene2').val());
             var parts = this.model.getOffspring();
 
             //
@@ -120,13 +77,13 @@
             // (Look@ https://github.com/uglyog/clientside-haml-js)
             var renderTemplate = $('#punnett-table-template').compile({
                 '.header .header_cell': {
-                    'other_part<-parts.0.pairs': {'.': 'other_part.allele'}
+                    'other_part<-parts.0.pairs': {'.': 'other_part.alleleString'}
                 },
                 '.rows': {
                     'part<-parts': {
-                        '.header_cell': 'part.allele',
+                        '.header_cell': 'part.alleleString',
                         '.result_cell': {
-                            'pair<-part.pairs': {'.': 'pair.gene'}
+                            'pair<-part.pairs': {'.': 'pair.genome'}
                         }
                     }
                 }
