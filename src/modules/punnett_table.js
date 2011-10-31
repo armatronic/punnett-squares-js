@@ -1,6 +1,7 @@
 (function(punnettTable) {
-    //
-    // Model for a breeding pair of genes.
+    /**
+     * Model for a breeding pair of genes.
+     */
     punnettTable.GenePair = Backbone.Model.extend({
         defaults: {
             gene1: [],
@@ -97,13 +98,14 @@
 
     //
     // Collection of genes: none yet, or collection of possible result genes?
+    // If there is, then store them in local storage.
 
-    //
-    // View: renders result of breedWith() into a table. (check out jQuery templates)
+
+    /**
+     * View: renders result of breedWith() into a table.
+     */
     punnettTable.View = Backbone.View.extend({
         model: new punnettTable.GenePair(),
-        //
-        // add a template later.
         render: function() {
             var g1 = this.model.setGene1(this.$('input.gene1').val());
             var g2 = this.model.setGene2(this.$('input.gene2').val());
@@ -133,12 +135,14 @@
             this.$('#punnett-table').empty().append(table);
             return this;
         },
+
+        //
+        // Listens on the submit event of the form within the template, and
+        // calls updateModels when this happens.
         events: {
             'submit form[name=punnett-squares]': 'updateModels'
         },
         updateModels: function() {
-            //
-            // Set new model values.
             this.render();
             return false;
         }
