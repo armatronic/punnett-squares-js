@@ -133,12 +133,32 @@
     // View: renders result of breedWith() into a table. (check out jQuery templates)
     Gene.View = Backbone.View.extend({
         model: new Gene.GenePair(),
+        //
+        // add a template later.
         render: function() {
             var g1 = this.model.setGene1(this.$('input.gene1').val());
             var g2 = this.model.setGene2(this.$('input.gene2').val());
-            // console.log(g1);
-            // console.log(g2);
-            this.model.getOffspring();
+            var parts = this.model.getOffspring();
+
+            var table = this.$('table.punnett_table').empty();
+
+            _.each(parts, function(part, i) {
+                if (i == 0) {
+                    var header = $('<tr />');
+                    header.append('<th />');
+                    _.each(part.pairs, function(other_part) {
+                        header.append($('<th />').text(other_part.allele));
+                    });
+                    table.append(header);
+                }
+                var row = $('<tr />');
+                row.append($('<th />').text(part.allele));
+                _.each(part.pairs, function(other_part) {
+                    row.append($('<td />').text(other_part.gene));
+                });
+                table.append(row);
+            });
+
             return this;
         },
         events: {
