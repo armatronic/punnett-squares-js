@@ -35,14 +35,14 @@
 
             var gene1_allele_strings = this.gene1.getPossibleAlleleStrings(gene_size);
             var gene2_allele_strings = this.gene2.getPossibleAlleleStrings(gene_size);
-            _.each(gene1_allele_strings, function(a1_string, i) {
+            _.each(gene2_allele_strings, function(a2_string, i) {
                 var gene_row = {
-                    alleleString: a1_string,
+                    alleleString: a2_string,
                     pairs:        []
                 };
-                _.each(gene2_allele_strings, function(a2_string, j) {
+                _.each(gene1_allele_strings, function(a1_string, j) {
                     gene_row.pairs.push({
-                        alleleString: a2_string,
+                        alleleString: a1_string,
                         genome:       Genome.fromAlleleStrings(a1_string, a2_string)
                     });
                 });
