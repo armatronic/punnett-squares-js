@@ -1,28 +1,16 @@
+<!DOCTYPE html>
 <html>
 <head>
 </head>
 <body>
     <div id="punnett-squares">
         <form name="punnett-squares">
-        Gene 1: <input type="input" name="gene1" class="gene gene1" value="A/a;B/B" /><br />
-        Gene 2: <input type="input" name="gene2" class="gene gene2" value="d/d;E/e" /><br />
-        <input type="submit" />
+            Gene 1: <input type="text" name="gene1" class="gene gene1" value="A/a;B/B" /><br />
+            Gene 2: <input type="text" name="gene2" class="gene gene2" value="d/d;E/e" /><br />
+            <input type="submit" />
         </form>
 
         <div id="punnett-table"></div>
-    </div>
-
-    <div id="punnett-table-template">
-        <table class="punnett_table">
-            <tr class="header">
-                <th>&nbsp;</th>
-                <th class="header_cell"></th>
-            </tr>
-            <tr class="rows">
-                <th class="header_cell"></th>
-                <td class="result_cell"></td>
-            </tr>
-        </table>
     </div>
 
     <script type="text/javascript" src="assets/js/jquery-1.6.4.min.js"></script>
